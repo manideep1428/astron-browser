@@ -1,0 +1,58 @@
+{
+  "name": "astron",
+  "version": "0.1.2-beta.1",
+  "type": "module",
+  "description": "AI-powered browser automation from the terminal. Point and command your browser with natural language.",
+  "license": "MIT",
+  "author": {
+    "name": "Manideep",
+    "email": "saimanideep.ch12345@gmail.com"
+  },
+  "keywords": [
+    "browser",
+    "automation",
+    "ai",
+    "cli",
+    "agent",
+    "browser-use",
+    "llm",
+    "openai",
+    "anthropic",
+    "gemini",
+    "terminal"
+  ],
+  "bin": {
+    "browser": "./src/cli.tsx"
+  },
+  "files": [
+    "src/",
+    "python/",
+    "pyproject.toml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "bun src/cli.tsx",
+    "dev": "bun src/cli.tsx",
+    "daemon": "bun src/cli.tsx --daemon",
+    "setup": "bun src/cli.tsx --setup"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.14"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.0.1",
+    "ink": "^6.8.0",
+    "ink-text-input": "^6.0.0",
+    "picocolors": "^1.1.1",
+    "react": "^19.2.4",
+    "use-interval": "^1.4.0"
+  }
+}
