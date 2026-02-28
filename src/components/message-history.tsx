@@ -2,13 +2,10 @@ import { Box, Text, Static } from "ink";
 import React from "react";
 import TerminalHeader from "./terminal-header.js";
 import AstronBanner from "./astron-banner.js";
+import type { OutputMessage } from "../types.js";
 
-export interface OutputMessage {
-  id: string;
-  type: "system" | "user" | "agent" | "error" | "done";
-  text: string;
-  timestamp: number;
-}
+// Re-export so existing consumers don't break
+export type { OutputMessage };
 
 interface MessageHistoryProps {
   messages: OutputMessage[];

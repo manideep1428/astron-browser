@@ -46,3 +46,9 @@ __pycache__
 
 # lock files (uv)
 uv.lock
+
+
+main.py
+
+pyproject.toml
+.python-version
