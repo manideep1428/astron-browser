@@ -53,7 +53,7 @@ const ThinkingSpinner: React.FC<ThinkingSpinnerProps> = ({ active }) => {
   return (
     <Box gap={2}>
       <Text color="cyan">{frames[frameIndex]}</Text>
-      <Text>Thinking{dots}</Text>
+      <Text>Working{dots}</Text>
       <Text dimColor>({formatTime(seconds)})</Text>
     </Box>
   );

@@ -53,7 +53,10 @@ export default function App({ prompt, mode }: AppProps): React.ReactElement {
     onKeySubmit,
     onKeyBack,
   } = useOnboarding();
-  const { isReady, startDaemon, stopDaemon, sendTask } = useDaemon(addMessage);
+  const { isReady, startDaemon, stopDaemon, sendTask } = useDaemon(
+    addMessage,
+    () => setLoading(false), // called by hook when Python sends __DONE__
+  );
 
   // ── Overlay state ────────────────────────────────────────────────
   const [overlayMode, setOverlayMode] = useState<OverlayMode>("none");

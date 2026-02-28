@@ -6,18 +6,23 @@
 
 export const VERSION = "0.1.0";
 
-/** Patterns from Python's browser-use stderr that are just noise. */
+/**
+ * Stderr lines to silently discard.
+ *
+ * IMPORTANT: Be conservative here.
+ * [Agent], [Browser], [Controller], [BrowserSession] etc. are the real
+ * step-by-step logs from browser-use that the user WANTS to see in the
+ * terminal. Only filter bare Python logging boilerplate that has zero
+ * useful information.
+ */
 export const STDERR_NOISE_PATTERNS: RegExp[] = [
-    /^\s*INFO\s/,
-    /\[BrowserSession\]/,
-    /\[SessionManager\]/,
-    /\[Browser\]/,
-    /\[Agent\]/,
-    /\[Controller\]/,
-    /\[DOMService\]/,
-    /\[NavigationHandler\]/,
-    /^\s*DEBUG\s/,
-    /^\s*WARNING\s/,
+    // Pure Python logging level with nothing after it
+    /^\s*INFO\s*$/,
+    /^\s*DEBUG\s*$/,
+    /^\s*WARNING\s*$/,
+    // Playwright / Chromium internal noise
+    /DevTools listening on ws:/,
+    /^\s*\[chromium\]/i,
 ];
 
 export function isStderrNoise(line: string): boolean {

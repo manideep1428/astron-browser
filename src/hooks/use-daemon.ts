@@ -15,26 +15,27 @@ import { useState, useCallback, useRef } from "react";
 import { resolve } from "path";
 import { syncEnvFile } from "../config.js";
 import { isStderrNoise } from "../constants.js";
-import type { AppConfig } from "../types.js";
-import type { OutputMessage } from "../types.js";
+import type { AppConfig, OutputMessage } from "../types.js";
 
 type AddMessage = (type: OutputMessage["type"], text: string) => void;
 
 export interface UseDaemonReturn {
     isReady: boolean;
-    isTaskRunning: boolean;
     startDaemon: (cfg: AppConfig) => void;
     stopDaemon: () => void;
     sendTask: (taskPrompt: string) => void;
 }
 
-export function useDaemon(addMessage: AddMessage): UseDaemonReturn {
+export function useDaemon(
+    addMessage: AddMessage,
+    /** Called whenever a task finishes (i.e. __DONE__ received from Python). */
+    onTaskDone: () => void,
+): UseDaemonReturn {
     const [isReady, setIsReady] = useState(false);
     const daemonRef = useRef<ReturnType<typeof Bun.spawn> | null>(null);
     const isReadyRef = useRef(false);
-    const isTaskRunningRef = useRef(false);
 
-    // ── Stop ─────────────────────────────────────────────────────────
+    // ── Stop ──────────────────────────────────────────────────────────
     const stopDaemon = useCallback(() => {
         const d = daemonRef.current;
         if (d) {
@@ -46,11 +47,12 @@ export function useDaemon(addMessage: AddMessage): UseDaemonReturn {
         setIsReady(false);
     }, []);
 
-    // ── Start ─────────────────────────────────────────────────────────
+    // ── Start ──────────────────────────────────────────────────────────
     const startDaemon = useCallback(
         (cfg: AppConfig) => {
             stopDaemon();
 
+            // import.meta.dir = .../src/hooks → two levels up = project root
             const scriptDir = import.meta.dir;
             const projectRoot = resolve(scriptDir, "../..");
             const pythonDir = resolve(projectRoot, "python");
@@ -75,7 +77,7 @@ export function useDaemon(addMessage: AddMessage): UseDaemonReturn {
 
             daemonRef.current = daemon;
 
-            // ── Stdout reader ────────────────────────────────────────────
+            // ── Stdout reader ─────────────────────────────────────────────
             const stdoutReader = daemon.stdout.getReader();
             const decoder = new TextDecoder();
 
@@ -110,17 +112,17 @@ export function useDaemon(addMessage: AddMessage): UseDaemonReturn {
                             }
                         }
 
-                        // Every __DONE__ delimiter = task finished
+                        // Every __DONE__ boundary = one task finished
                         if (i < parts.length - 1) {
-                            isTaskRunningRef.current = false;
                             addMessage("done", "Task completed");
+                            onTaskDone(); // ← tells App to clear the loading/spinner
                         }
                     }
                 }
                 addMessage("system", "Browser daemon stopped");
             })();
 
-            // ── Stderr reader ────────────────────────────────────────────
+            // ── Stderr reader ─────────────────────────────────────────────
             const stderrReader = daemon.stderr.getReader();
             const stderrDecoder = new TextDecoder();
 
@@ -139,17 +141,16 @@ export function useDaemon(addMessage: AddMessage): UseDaemonReturn {
                 }
             })();
         },
-        [addMessage, stopDaemon],
+        [addMessage, onTaskDone, stopDaemon],
     );
 
-    // ── Send a task ───────────────────────────────────────────────────
+    // ── Send a task ────────────────────────────────────────────────────
     const sendTask = useCallback(
         (taskPrompt: string) => {
             if (!daemonRef.current || !isReadyRef.current) {
                 addMessage("error", "Daemon is not ready yet. Please wait...");
                 return;
             }
-            isTaskRunningRef.current = true;
             const stdin = daemonRef.current.stdin as unknown as {
                 write: (s: string) => void;
                 flush: () => void;
@@ -160,11 +161,5 @@ export function useDaemon(addMessage: AddMessage): UseDaemonReturn {
         [addMessage],
     );
 
-    return {
-        isReady,
-        isTaskRunning: isTaskRunningRef.current,
-        startDaemon,
-        stopDaemon,
-        sendTask,
-    };
+    return { isReady, startDaemon, stopDaemon, sendTask };
 }
