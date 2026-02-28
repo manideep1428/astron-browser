@@ -21,8 +21,10 @@
 
 ## Installation
 
+> **Note:** `astron-browser` is currently in **beta**. Install with the `@beta` tag:
+
 ```bash
-npm i -g astron-cli
+npm i -g astron-browser@beta
 ```
 
 ## Quick Start
