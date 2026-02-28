@@ -1,6 +1,6 @@
 {
-  "name": "astron",
-  "version": "0.1.2-beta.1",
+  "name": "astron-cli",
+  "version": "0.1.5-beta",
   "type": "module",
   "description": "AI-powered browser automation from the terminal. Point and command your browser with natural language.",
   "license": "MIT",
@@ -22,14 +22,15 @@
     "terminal"
   ],
   "bin": {
-    "browser": "./src/cli.tsx"
+    "astron": "bin/astron.js"
   },
   "files": [
     "src/",
     "python/",
     "pyproject.toml",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "bin/"
   ],
   "scripts": {
     "start": "bun src/cli.tsx",
